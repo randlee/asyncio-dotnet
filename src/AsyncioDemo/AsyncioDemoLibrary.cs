@@ -17,25 +17,11 @@ public class AsyncioDemoLibrary
     /// </summary>
     /// <param name="delayMilliseconds">Delay in milliseconds</param>
     /// <returns>TaskCompletionSource with Task that returns the delay value</returns>
-    public TaskCompletionSource<int> CreatePromiseReturningInt(int delayMilliseconds)
+    public async Task<int> CreatePromiseReturningInt(int delayMilliseconds)
     {
-        var tcs = new TaskCompletionSource<int>();
-        
         // Start the async operation without blocking
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await Task.Delay(delayMilliseconds);
-                tcs.SetResult(delayMilliseconds);
-            }
-            catch (Exception ex)
-            {
-                tcs.SetException(ex);
-            }
-        });
-        
-        return tcs;
+        await Task.Delay(delayMilliseconds);
+        return delayMilliseconds;
     }
     
     /// <summary>
@@ -43,25 +29,10 @@ public class AsyncioDemoLibrary
     /// </summary>
     /// <param name="delayMilliseconds">Delay in milliseconds</param>
     /// <returns>TaskCompletionSource with Task that returns IntWrapper containing the delay value</returns>
-    public TaskCompletionSource<IntWrapper> CreatePromiseReturningWrapper(int delayMilliseconds)
+    public async Task<IntWrapper> CreatePromiseReturningWrapper(int delayMilliseconds)
     {
-        var tcs = new TaskCompletionSource<IntWrapper>();
-        
-        // Start the async operation without blocking
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await Task.Delay(delayMilliseconds);
-                tcs.SetResult(new IntWrapper(delayMilliseconds));
-            }
-            catch (Exception ex)
-            {
-                tcs.SetException(ex);
-            }
-        });
-        
-        return tcs;
+        await Task.Delay(delayMilliseconds);
+        return new IntWrapper(delayMilliseconds);
     }
     
     #endregion
@@ -115,12 +86,8 @@ public class AsyncioDemoLibrary
         for (int i = 0; i < count; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            
             if (i > 0) // Don't delay before the first item
-            {
                 await Task.Delay(delayMilliseconds, cancellationToken);
-            }
-            
             yield return i;
         }
     }
@@ -140,12 +107,8 @@ public class AsyncioDemoLibrary
         for (int i = 0; i < count; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            
             if (i > 0) // Don't delay before the first item
-            {
                 await Task.Delay(delayMilliseconds, cancellationToken);
-            }
-            
             yield return new IntWrapper(i);
         }
     }
